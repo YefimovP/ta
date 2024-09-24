@@ -1,0 +1,37 @@
+name: Setup GCP Environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment_name:
+        description: 'Name of the environment (e.g., staging, production)'
+        required: true
+      gcp_project_id:
+        description: 'GCP Project ID'
+        required: true
+
+jobs:
+  setup-environment:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        project_id: ${{ github.event.inputs.gcp_project_id }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+
+    - name: Configure GitHub secrets and variables
+      run: |
+        echo "Setting up environment variables for ${{ github.event.inputs.environment_name }}..."
+        echo "GCP_PROJECT_ID=${{ github.event.inputs.gcp_project_id }}" >> $GITHUB_ENV
+        echo "SERVICE_ACCOUNT_KEY=${{ secrets.GCP_SA_KEY }}" >> $GITHUB_ENV
+
+    - name: Verify GCP setup
+      run: |
+        gcloud config set project ${{ github.event.inputs.gcp_project_id }}
+        gcloud auth list
