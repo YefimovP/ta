@@ -27,4 +27,5 @@ jobs:
             --image us-docker.pkg.dev/dotted-music-435509-q2/app-repo/app \
             --platform managed \
             --region us-central1 \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --project ${{ secrets.GCP_PROJECT_ID }}
