@@ -28,9 +28,9 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
+          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}  # Встановлюємо проект
           gcloud run deploy app \
             --image us-docker.pkg.dev/dotted-music-435509-q2/app-repo/app \
             --platform managed \
             --region us-central1 \
-            --allow-unauthenticated \
-            --project ${{ secrets.GCP_PROJECT_ID }}
+            --allow-unauthenticated
