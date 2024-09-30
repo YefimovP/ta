@@ -10,6 +10,10 @@ on:
         description: 'GCP Project ID'
         required: true
 
+permissions:
+  contents: write
+  deployments: write
+
 jobs:
   setup-environment:
     runs-on: ubuntu-latest
