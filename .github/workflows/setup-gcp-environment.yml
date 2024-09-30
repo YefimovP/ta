@@ -37,6 +37,9 @@ jobs:
         gh api repos/${{ github.repository }}/environments/${{ github.event.inputs.environment_name }} \
           --method PUT
 
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Add secrets to GitHub Environment
       run: |
         gh secret set GCP_SA_KEY --env ${{ github.event.inputs.environment_name }} --body "${{ secrets.GCP_SA_KEY }}"
