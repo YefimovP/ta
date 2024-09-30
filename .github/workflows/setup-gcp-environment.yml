@@ -18,8 +18,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Install GitHub CLI
+      run: sudo apt-get install gh -y
+
     - name: Authenticate with Google Cloud
-      uses: google-github-actions/auth@v0
+      uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
 
@@ -27,11 +30,18 @@ jobs:
       run: |
         echo "Setting up Google Cloud SDK..."
         gcloud config set project ${{ github.event.inputs.gcp_project_id }}
-
-    - name: Configure GitHub secrets and variables
+      
+    - name: Create GitHub Environment
       run: |
-        echo "Setting up environment variables for ${{ github.event.inputs.environment_name }}..."
-        echo "GCP_PROJECT_ID=${{ github.event.inputs.gcp_project_id }}" >> $GITHUB_ENV
+        echo "Creating environment: ${{ github.event.inputs.environment_name }}"
+        gh api repos/${{ github.repository }}/environments/${{ github.event.inputs.environment_name }} \
+          --method PUT
+
+    - name: Add secrets to GitHub Environment
+      run: |
+        gh secret set GCP_SA_KEY --env ${{ github.event.inputs.environment_name }} --body "${{ secrets.GCP_SA_KEY }}"
+        gh secret set GCP_PROJECT_ID --env ${{ github.event.inputs.environment_name }} --body "${{ github.event.inputs.gcp_project_id }}"
+
 
     - name: Verify GCP setup
       run: |
