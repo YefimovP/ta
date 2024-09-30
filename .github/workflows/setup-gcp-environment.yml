@@ -34,20 +34,18 @@ jobs:
       run: |
         echo "Setting up Google Cloud SDK..."
         gcloud config set project ${{ github.event.inputs.gcp_project_id }}
-      
+
     - name: Create GitHub Environment
       run: |
         echo "Creating environment: ${{ github.event.inputs.environment_name }}"
         gh api repos/${{ github.repository }}/environments/${{ github.event.inputs.environment_name }} \
           --method PUT
+
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Add secrets to GitHub Environment
       run: |
+        echo "Adding secrets to the environment..."
         gh secret set GCP_SA_KEY --env ${{ github.event.inputs.environment_name }} --body "${{ secrets.GCP_SA_KEY }}"
         gh secret set GCP_PROJECT_ID --env ${{ github.event.inputs.environment_name }} --body "${{ github.event.inputs.gcp_project_id }}"
-
-    - name: Verify GCP setup
-      run: |
-        gcloud auth list
